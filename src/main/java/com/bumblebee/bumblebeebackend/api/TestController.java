@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class TestController {
 
     @GetMapping
-    public ResponseEntity<StandardResponse> adminSingUp(){
+    public ResponseEntity<StandardResponse> adminSingUp(@RequestAttribute String type){
+        System.out.println(type);
         return new ResponseEntity<>(
                 new StandardResponse(201,"success",null),
                 HttpStatus.CREATED

@@ -14,11 +14,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class AdminRegisterDTO implements Serializable {
+public class RegisterDTO implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
     private String confirmEmail;
+    private String nic;
+    private String address;
     private String password;
     private String confirmPassword;
     private String countryCode;

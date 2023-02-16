@@ -1,6 +1,7 @@
 package com.bumblebee.bumblebeebackend.filter;
 
 import com.bumblebee.bumblebeebackend.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -40,7 +41,9 @@ public class JwtRequestFilter extends OncePerRequestFilter  {
                 jwt = authorizationHeader.substring(7);
                 try {
                     userName = jwtUtil.extractUserName(jwt);
+                    Claims claims = jwtUtil.extractAllClaims(jwt);
                     request.setAttribute("userName",userName);
+                    request.setAttribute("type",claims.get("type"));
                 } catch (Exception e) {
                     request.setAttribute("code", 401);
                     request.setAttribute("message", "Expired JWT token");

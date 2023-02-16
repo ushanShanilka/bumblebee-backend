@@ -1,6 +1,5 @@
 package com.bumblebee.bumblebeebackend.repo;
 
-import com.bumblebee.bumblebeebackend.entity.Admin;
 import com.bumblebee.bumblebeebackend.entity.AdminLoginCredential;
 import com.bumblebee.bumblebeebackend.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +19,4 @@ public interface AdminLoginCredentialRepo extends JpaRepository<AdminLoginCreden
 	List<AdminLoginCredential> findAll();
 	void deleteById(Long id);
 	AdminLoginCredential findByUserNameAndStatusId(String userName, Status status);
-	AdminLoginCredential findByAdminIdAndStatusId(Admin admin, Status status);
 }

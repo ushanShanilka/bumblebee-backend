@@ -1,11 +1,7 @@
 package com.bumblebee.bumblebeebackend.filter;
 
-import com.bumblebee.bumblebeebackend.entity.AdminLoginCredential;
-import com.bumblebee.bumblebeebackend.entity.AdminPassword;
-import com.bumblebee.bumblebeebackend.entity.Status;
-import com.bumblebee.bumblebeebackend.repo.AdminLoginCredentialRepo;
-import com.bumblebee.bumblebeebackend.repo.AdminPasswordRepo;
-import com.bumblebee.bumblebeebackend.repo.StatusRepo;
+import com.bumblebee.bumblebeebackend.entity.*;
+import com.bumblebee.bumblebeebackend.repo.*;
 import com.bumblebee.bumblebeebackend.util.AdminTypeId;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +30,11 @@ public class UserDetailService implements UserDetailsService {
     StatusRepo statusRepo;
     @Autowired
     AdminPasswordRepo adminPasswordRepo;
+    @Autowired
+    UserLoginCredentialRepo userLoginCredentialRepo;
+    @Autowired
+    UserPasswordRepo userPasswordRepo;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -42,30 +43,42 @@ public class UserDetailService implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         String password = "";
 
-        AdminLoginCredential adminLoginCredential = adminLoginCredentialRepo.findByUserNameAndStatusId(username, active);
+        UserLoginCredential userLoginCredential = userLoginCredentialRepo.findByUserNameAndStatusId(username, active);
 
-        if (Objects.equals(adminLoginCredential.getAdminId().getAdminTypeId().getId(), AdminTypeId.ADMIN)) {
-            AdminPassword pass = adminPasswordRepo.findByAdminLoginCredentialIdAndStatusId(adminLoginCredential, active);
-
-            if (Objects.equals(pass, null)) {
+        if (!Objects.equals(userLoginCredential, null)){
+            UserPassword userPassword = userPasswordRepo.findByUserLoginCredentialIdAndStatusId(userLoginCredential, active);
+            if (Objects.equals(userPassword, null)) {
                 throw new BadCredentialsException("Invalid Credentials");
             }
+            authorities.add(new SimpleGrantedAuthority("USER"));
 
-            authorities.add(new SimpleGrantedAuthority("ADMIN"));
+            password = userPassword.getPassword();
+        }else {
+            AdminLoginCredential adminLoginCredential = adminLoginCredentialRepo.findByUserNameAndStatusId(username, active);
 
-            password = pass.getPassword();
-        }
+            if (Objects.equals(adminLoginCredential.getAdminId().getAdminTypeId().getId(), AdminTypeId.ADMIN)) {
+                AdminPassword pass = adminPasswordRepo.findByAdminLoginCredentialIdAndStatusId(adminLoginCredential, active);
 
-        if (Objects.equals(adminLoginCredential.getAdminId().getAdminTypeId().getId(), AdminTypeId.SUPERADMIN)) {
-            AdminPassword pass = adminPasswordRepo.findByAdminLoginCredentialIdAndStatusId(adminLoginCredential, active);
+                if (Objects.equals(pass, null)) {
+                    throw new BadCredentialsException("Invalid Credentials");
+                }
 
-            if (Objects.equals(pass, null)) {
-                throw new BadCredentialsException("Invalid Credentials");
+                authorities.add(new SimpleGrantedAuthority("ADMIN"));
+
+                password = pass.getPassword();
             }
 
-            authorities.add(new SimpleGrantedAuthority("SUPERADMIN"));
+            if (Objects.equals(adminLoginCredential.getAdminId().getAdminTypeId().getId(), AdminTypeId.SUPERADMIN)) {
+                AdminPassword pass = adminPasswordRepo.findByAdminLoginCredentialIdAndStatusId(adminLoginCredential, active);
 
-            password = pass.getPassword();
+                if (Objects.equals(pass, null)) {
+                    throw new BadCredentialsException("Invalid Credentials");
+                }
+
+                authorities.add(new SimpleGrantedAuthority("SUPERADMIN"));
+
+                password = pass.getPassword();
+            }
         }
         return new User(username,password, authorities);
     }

@@ -7,7 +7,6 @@ import com.bumblebee.bumblebeebackend.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
 /**
  * @author Ushan Shanilka <ushanshanilka80@gmail.com>
@@ -17,6 +16,5 @@ import java.util.List;
 @Repository
 public interface AdminPasswordRepo extends JpaRepository<AdminPassword,Long> {
     AdminPassword findByAdminLoginCredentialIdAndStatusId(AdminLoginCredential adminLoginCredential, Status status);
-    List<AdminPassword> findAll();
     void deleteById(Long id);
 }

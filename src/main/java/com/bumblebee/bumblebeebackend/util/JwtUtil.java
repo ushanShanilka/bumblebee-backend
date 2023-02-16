@@ -34,7 +34,7 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) throws ExpiredJwtException{
+    public Claims extractAllClaims(String token) throws ExpiredJwtException{
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
@@ -42,8 +42,9 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserDetails userDetails,String userType ){
         Map<String, Object> claims = new HashMap<>();
+        claims.put("type", userType);
         return creteToken(claims,userDetails.getUsername());
     }
 

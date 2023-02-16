@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailService);
+        DaoAuthenticationConfigurer<AuthenticationManagerBuilder, UserDetailService> configurer = auth.userDetailsService(userDetailService);
     }
 
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,8 +43,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v3/api-docs/swagger-config",
                         "/swagger-ui.html",
                         "/webjars/**",
-                        "/api/v1/authenticates/admin/login")
+                        "/api/v1/authenticates/admin/login",
+                        "/api/v1/authenticates/user/login",
+                        "/api/v1/authenticates/user/signup")
                 .permitAll()
+                .antMatchers().hasAuthority("USER")
+                .antMatchers().hasAnyAuthority("ADMIN", "SUPERADMIN", "USER")
+                .antMatchers("/api/v1/test").hasAnyAuthority("ADMIN", "SUPERADMIN")
                 .antMatchers("/api/v1/authenticate/admin").hasAnyAuthority("SUPERADMIN")
                 .anyRequest().authenticated()
                 .and().sessionManagement()
