@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class JwtUtil {
     private String SECRET_KEY = "secret";
 
-    public String extractEmail(String token) throws ExpiredJwtException {
+    public String extractUserName (String token) throws ExpiredJwtException {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -54,7 +54,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails){
-        final String userName = extractEmail(token);
+        final String userName = extractUserName(token);
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 }

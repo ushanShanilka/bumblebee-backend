@@ -16,7 +16,7 @@ import java.util.Map;
 
 public interface AdminService {
     LoginResponseDTO adminLogin(AuthenticationRequestDTO dto);
-    String adminSingUp(AdminRegisterDTO dto);
+    String adminSingUp(AdminRegisterDTO dto, String userName);
     LoginResponseDTO adminPasswordChange(PasswordChangeDTO dto);
     List<Map<String, Object>> getAllAdmin(String value);
     String deleteUser(Long adminId);

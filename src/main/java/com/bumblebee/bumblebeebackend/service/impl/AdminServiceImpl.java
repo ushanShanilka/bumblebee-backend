@@ -4,13 +4,11 @@ import com.bumblebee.bumblebeebackend.dto.AdminRegisterDTO;
 import com.bumblebee.bumblebeebackend.dto.AuthenticationRequestDTO;
 import com.bumblebee.bumblebeebackend.dto.LoginResponseDTO;
 import com.bumblebee.bumblebeebackend.dto.PasswordChangeDTO;
-import com.bumblebee.bumblebeebackend.entity.AdminLoginCredential;
-import com.bumblebee.bumblebeebackend.entity.Status;
-import com.bumblebee.bumblebeebackend.repo.AdminLoginCredentialRepo;
-import com.bumblebee.bumblebeebackend.repo.AdminRepo;
-import com.bumblebee.bumblebeebackend.repo.AdminTypeRepo;
-import com.bumblebee.bumblebeebackend.repo.StatusRepo;
+import com.bumblebee.bumblebeebackend.entity.*;
+import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
+import com.bumblebee.bumblebeebackend.repo.*;
 import com.bumblebee.bumblebeebackend.service.AdminService;
+import com.bumblebee.bumblebeebackend.util.AdminTypeId;
 import com.bumblebee.bumblebeebackend.util.JwtUtil;
 import com.bumblebee.bumblebeebackend.util.LoginStatusId;
 import com.bumblebee.bumblebeebackend.util.StatusId;
@@ -21,8 +19,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
+import javax.transaction.Transactional;
+import javax.transaction.TransactionalException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,10 @@ public class AdminServiceImpl implements AdminService {
     UserDetailsService userDetailsService;
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired
+    AdminTypeRepo adminTypeRepo;
+    @Autowired
+    AdminPasswordRepo adminPasswordRepo;
 
     @Override
     public LoginResponseDTO adminLogin (AuthenticationRequestDTO dto) {
@@ -89,9 +95,63 @@ public class AdminServiceImpl implements AdminService {
         return response;
     }
 
+    @Transactional
     @Override
-    public String adminSingUp (AdminRegisterDTO dto) {
-        return null;
+    public String adminSingUp (AdminRegisterDTO dto, String userName) {
+        Status active = statusRepo.findById(StatusId.ACTIVE);
+        AdminLoginCredential adminLogin = adminLoginCredentialRepo.findByUserNameAndStatusId(userName, active);
+
+        if (!Objects.equals(adminLogin, null)){
+            Admin admin = adminRepo.findByEmailAndStatusId(userName, active);
+            if (Objects.equals(admin.getAdminTypeId().getId(), AdminTypeId.SUPERADMIN)){
+
+                if (!adminRepo.existsByEmailAndStatusId(dto.getEmail(), active)){
+                    AdminType type = adminTypeRepo.findById(AdminTypeId.ADMIN);
+                    Date date = new Date();
+
+                    Admin a = new Admin();
+                    a.setFirstName(dto.getFirstName());
+                    a.setLastName(dto.getLastName());
+                    a.setEmail(dto.getEmail());
+                    a.setCountryCode(dto.getCountryCode());
+                    a.setPhoneNumber(dto.getPhoneNumber());
+                    a.setAdminTypeId(type);
+                    a.setStatusId(active);
+                    a.setCreatedAt(date);
+                    a.setUpdatedAt(date);
+
+                    Admin save = adminRepo.save(a);
+                    if (!Objects.equals(save.getId(),null)){
+                        AdminLoginCredential adminLoginCredential = new AdminLoginCredential();
+                        adminLoginCredential.setAdminId(save);
+                        adminLoginCredential.setUserName(dto.getEmail());
+                        adminLoginCredential.setStatusId(active);
+                        adminLoginCredential.setCreatedAt(date);
+                        adminLoginCredential.setUpdatedAt(date);
+                        AdminLoginCredential loginCredential = adminLoginCredentialRepo.save(adminLoginCredential);
+
+                        if (!Objects.equals(loginCredential.getId(),null)){
+                            AdminPassword password = new AdminPassword();
+                            password.setPassword(BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt(10)));
+                            password.setAdminLoginCredentialId(adminLoginCredential);
+                            password.setStatusId(active);
+                            password.setCreatedAt(date);
+                            password.setUpdatedAt(date);
+                            adminPasswordRepo.save(password);
+                            return "Success";
+                        }else {
+                            throw new TransactionalException("something went wrong",null);
+                        }
+                    }else {
+                        throw new TransactionalException("something went wrong",null);
+                    }
+                }else {
+                    throw new EntryDuplicateException("Email Already Exist!");
+                }
+            }
+            throw new BadCredentialsException("Invalid super admin");
+        }
+        throw new BadCredentialsException("Invalid admin");
     }
 
     @Override

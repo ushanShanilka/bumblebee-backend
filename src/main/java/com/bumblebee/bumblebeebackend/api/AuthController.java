@@ -1,8 +1,10 @@
 package com.bumblebee.bumblebeebackend.api;
 
+import com.bumblebee.bumblebeebackend.dto.AdminRegisterDTO;
 import com.bumblebee.bumblebeebackend.dto.AuthenticationRequestDTO;
 import com.bumblebee.bumblebeebackend.dto.LoginResponseDTO;
 import com.bumblebee.bumblebeebackend.service.AdminService;
+import com.bumblebee.bumblebeebackend.util.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,15 @@ public class AuthController {
         return new ResponseEntity<>(
                 response,
                 HttpStatus.OK
+        );
+    }
+
+    @PostMapping(path = "/admin")
+    public ResponseEntity<StandardResponse> adminSingUp(@RequestBody AdminRegisterDTO dto, @RequestAttribute String userName){
+        String s = adminService.adminSingUp(dto, userName);
+        return new ResponseEntity<>(
+                new StandardResponse(201,s,null),
+                HttpStatus.CREATED
         );
     }
 }

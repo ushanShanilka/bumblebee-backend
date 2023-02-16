@@ -6,6 +6,6 @@ package com.bumblebee.bumblebeebackend.util;
  **/
 
 public class AdminTypeId {
-    public static final Short ADMIN = 1;
-    public static final Short SUPERADMIN = 2;
+    public static final Short SUPERADMIN = 1;
+    public static final Short ADMIN = 2;
 }

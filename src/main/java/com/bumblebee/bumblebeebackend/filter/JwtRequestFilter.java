@@ -32,14 +32,15 @@ public class JwtRequestFilter extends OncePerRequestFilter  {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain){
         final String authorizationHeader = request.getHeader("Authorization");
-        String email = null;
+        String userName = null;
         String jwt = null;
         Map<String, Long> map = null;
         try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
                 jwt = authorizationHeader.substring(7);
                 try {
-                    email = jwtUtil.extractEmail(jwt);
+                    userName = jwtUtil.extractUserName(jwt);
+                    request.setAttribute("userName",userName);
                 } catch (Exception e) {
                     request.setAttribute("code", 401);
                     request.setAttribute("message", "Expired JWT token");
@@ -53,8 +54,8 @@ public class JwtRequestFilter extends OncePerRequestFilter  {
                 SecurityContextHolder.clearContext();
             }
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailService.loadUserByUsername(email);
+            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
                 if (jwtUtil.validateToken(jwt, userDetails)){
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
