@@ -32,8 +32,8 @@ public class Stock implements Serializable {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Product productId;
-    @Column(name = "createdBy")
-    private String createdBy;
+    @Column(name = "last_updated_by")
+    private String lastUpdatedBy;
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Status statusId;

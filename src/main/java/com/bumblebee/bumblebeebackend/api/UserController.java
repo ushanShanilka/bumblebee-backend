@@ -25,7 +25,6 @@ public class UserController {
 
     @GetMapping(path = "/all")
     public ResponseEntity<StandardResponse> getAllUsers(@RequestAttribute String type){
-        System.out.println(type);
         List<Map<String, Object>> allUsers = userService.getAllUsers(type);
         return new ResponseEntity<>(
                 new StandardResponse(200,"success",allUsers),

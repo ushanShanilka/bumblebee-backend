@@ -15,10 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ProductDTO implements Serializable {
+    private Long id;
     private String productName;
     private String description;
     private double rating;
     private double price;
-    private double qty;
+    private StockDTO qty;
     private List<ProductHasImageDTO> productHasImageDTOS;
 }

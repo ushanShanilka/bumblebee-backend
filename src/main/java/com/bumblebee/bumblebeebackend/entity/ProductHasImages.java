@@ -29,8 +29,8 @@ public class ProductHasImages implements Serializable {
     private Date updatedAt;
     @Column(name = "url")
     private String url;
-    @Column(name = "createdBy")
-    private String createdBy;
+    @Column(name = "last_updated_by")
+    private String lastUpdatedBy;
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Product productId;

@@ -14,6 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 public class ProductHasImageDTO implements Serializable {
+    private Long id;
     private Long productId;
     private String url;
 }

@@ -149,7 +149,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Map<String, Object>> getAllUsers (String type) {
-        System.out.println(type.equals("ADMIN"));
         if (type.equals("ADMIN") || type.equals("SUPERADMIN")){
             List<User> all = userRepo.findAll();
             List<Map<String, Object>> map = new ArrayList<>();

@@ -14,6 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 public class StockDTO implements Serializable {
+    private Long id;
     private Long productId;
     private double qty;
 }

@@ -2,6 +2,7 @@ package com.bumblebee.bumblebeebackend.repo;
 
 import com.bumblebee.bumblebeebackend.entity.Product;
 import com.bumblebee.bumblebeebackend.entity.Status;
+import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,12 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     @Query(value = "select * from product where product_name=?1 and status_id=1", nativeQuery = true)
     Product existsByProductName(String name);
 
+    @Query(value = "select * from product where id=?1 and status_id=?2", nativeQuery = true)
+    Product existsById(Long id, int statusId);
+
     @Query(value = "select * from product where concat(product_name, rating, description, price) like %?1% and status_id=?2", nativeQuery = true)
     Page<Product> getAllProduct(String value, int statusId, Pageable pageable);
+
+    @Query(value = "select * from product where concat(product_name, rating, description, price) like %?1%", nativeQuery = true)
+    Page<Product> getAllProductForAdmin(String value, Pageable pageable);
 }

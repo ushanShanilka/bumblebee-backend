@@ -35,8 +35,8 @@ public class Product  implements Serializable {
     private double rating;
     @Column(name = "price")
     private double price;
-    @Column(name = "createdBy")
-    private String createdBy;
+    @Column(name = "last_updated_by")
+    private String lastUpdatedBy;
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Status statusId;
