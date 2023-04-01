@@ -30,11 +30,11 @@ public class AuthController {
     UserService userService;
 
     @PostMapping(path = "/admin/login")
-    public ResponseEntity<LoginResponseDTO> adminLogin(@RequestBody AuthenticationRequestDTO dto){
+    public ResponseEntity<StandardResponse> adminLogin(@RequestBody AuthenticationRequestDTO dto){
         LoginResponseDTO response = adminService.adminLogin(dto);
         return new ResponseEntity<>(
-                response,
-                HttpStatus.OK
+                new StandardResponse(200,"success",response),
+                HttpStatus.CREATED
         );
     }
 

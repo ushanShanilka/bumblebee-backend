@@ -7,6 +7,7 @@ import com.bumblebee.bumblebeebackend.dto.PasswordChangeDTO;
 import com.bumblebee.bumblebeebackend.entity.*;
 import com.bumblebee.bumblebeebackend.exception.CustomException;
 import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
+import com.bumblebee.bumblebeebackend.exception.EntryNotFoundException;
 import com.bumblebee.bumblebeebackend.repo.*;
 import com.bumblebee.bumblebeebackend.service.AdminService;
 import com.bumblebee.bumblebeebackend.util.AdminTypeId;
@@ -67,16 +68,12 @@ public class AdminServiceImpl implements AdminService {
         AdminLoginCredential adminLogin = adminLoginCredentialRepo.findByUserNameAndStatusId(dto.getUsername(), status);
 
         if (Objects.equals(adminLogin, null)) {
-            response.setMessage("not found");
-            response.setCode(404);
-            return response;
+            throw new EntryNotFoundException("User Not Found");
         }
 
         boolean exists = adminRepo.existsById(adminLogin.getAdminId().getId());
         if (!exists){
-            response.setMessage("not found");
-            response.setCode(404);
-            return response;
+            throw new EntryNotFoundException("User Not Found");
         }
 
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
