@@ -55,14 +55,23 @@ public class StockServiceImpl implements StockService {
         Date date = new Date();
         Status active = statusService.getStatus(StatusId.ACTIVE);
 
-        return new Stock(
+        Stock stock = new Stock(
                 dto.getId(),
-                date,
-                date,
+                null,
+                null,
                 dto.getQty(),
                 product,
                 userName,
                 active
         );
+
+        if (stock.getId() > 0){
+            stock.setUpdatedAt(date);
+        }else {
+            stock.setCreatedAt(date);
+            stock.setUpdatedAt(date);
+        }
+
+        return stock;
     }
 }

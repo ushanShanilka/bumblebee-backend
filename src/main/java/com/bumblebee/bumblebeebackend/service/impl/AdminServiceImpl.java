@@ -123,6 +123,7 @@ public class AdminServiceImpl implements AdminService {
                 a.setFirstName(dto.getFirstName());
                 a.setLastName(dto.getLastName());
                 a.setEmail(dto.getEmail());
+                a.setDateOfBirth(dto.getDateOfBirth());
                 a.setCountryCode(dto.getCountryCode());
                 a.setPhoneNumber(dto.getPhoneNumber());
                 a.setAdminTypeId(type);

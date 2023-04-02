@@ -5,11 +5,13 @@ import com.bumblebee.bumblebeebackend.entity.Product;
 import com.bumblebee.bumblebeebackend.entity.ProductHasImages;
 import com.bumblebee.bumblebeebackend.entity.Status;
 import com.bumblebee.bumblebeebackend.entity.User;
+import com.bumblebee.bumblebeebackend.exception.EntryNotFoundException;
 import com.bumblebee.bumblebeebackend.repo.ProductHasImagesRepo;
 import com.bumblebee.bumblebeebackend.service.ProductHasImagesService;
 import com.bumblebee.bumblebeebackend.service.StatusService;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,13 +35,22 @@ public class ProductHasImagesServiceImpl implements ProductHasImagesService {
     }
 
     @Override
-    public String updateImages (List<ProductHasImageDTO> dto, Product product, String userName) {
-        return null;
+    public String updateImages (List<ProductHasImageDTO> dtos, Product product, String userName) {
+        productHasImagesRepo.saveAll(toProductHasImagesList(dtos, product, userName));
+        return "success";
     }
 
     @Override
-    public String deleteImage (Long id, String userName) {
-        return null;
+    public String deleteImage (Long id, String userName, String type) {
+        if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
+            ProductHasImages images = productHasImagesRepo.getImagesById(id);
+            if (!Objects.equals(images, null)){
+                productHasImagesRepo.delete(images);
+                return "success";
+            }
+            throw new EntryNotFoundException("image not Exist");
+        }
+        throw new BadCredentialsException("Invalid User");
     }
 
     @Override
@@ -60,15 +71,24 @@ public class ProductHasImagesServiceImpl implements ProductHasImagesService {
         Date date = new Date();
         Status active = statusService.getStatus(StatusId.ACTIVE);
 
-        return new ProductHasImages(
+        ProductHasImages images = new ProductHasImages(
                 dto.getId(),
-                date,
-                date,
+                null,
+                null,
                 dto.getUrl(),
                 user,
                 product,
                 active
         );
+
+        if (images.getId() > 0){
+            images.setUpdatedAt(date);
+        }else {
+            images.setCreatedAt(date);
+            images.setUpdatedAt(date);
+        }
+
+        return images;
     }
 
     private List<ProductHasImages> toProductHasImagesList(List<ProductHasImageDTO> dtos, Product product, String userName){

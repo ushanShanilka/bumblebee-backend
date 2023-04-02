@@ -1,16 +1,14 @@
 package com.bumblebee.bumblebeebackend.api;
 
-import com.bumblebee.bumblebeebackend.dto.Paginated.PaginatedDTO;
 import com.bumblebee.bumblebeebackend.dto.ProductDTO;
 import com.bumblebee.bumblebeebackend.service.ProductService;
 import com.bumblebee.bumblebeebackend.util.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,8 +42,8 @@ public class ProductController {
     }
 
     @GetMapping(params = "id")
-    public ResponseEntity<StandardResponse> getProduct(@RequestParam Long id, @RequestAttribute String userName){
-        Map<String, Object> product = productService.getProduct(id, userName);
+    public ResponseEntity<StandardResponse> getProduct(@RequestParam Long id, @RequestAttribute String userName,@RequestAttribute String type){
+        Map<String, Object> product = productService.getProduct(id, userName, type);
         return new ResponseEntity<>(
                 new StandardResponse(200,"success",product),
                 HttpStatus.CREATED
@@ -61,15 +59,11 @@ public class ProductController {
         );
     }
 
-    @GetMapping(path = "/all", params = {"value", "page", "size"})
+    @GetMapping(path = "/all", params = {"value"})
     public ResponseEntity<StandardResponse> getAllProduct(@RequestParam String value,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "10") int size,
                                                           @RequestAttribute String type){
 
-        PageRequest pageable = PageRequest.of(page, size, Sort.by("id").descending());
-
-        PaginatedDTO allProduct = productService.getAllProduct(value,type, pageable);
+        List<Map<String, Object>> allProduct = productService.getAllProduct(value, type);
         return new ResponseEntity<>(
                 new StandardResponse(200,"success",allProduct),
                 HttpStatus.CREATED

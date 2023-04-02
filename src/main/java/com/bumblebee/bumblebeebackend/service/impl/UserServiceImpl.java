@@ -6,13 +6,12 @@ import com.bumblebee.bumblebeebackend.dto.RegisterDTO;
 import com.bumblebee.bumblebeebackend.entity.*;
 import com.bumblebee.bumblebeebackend.exception.CustomException;
 import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
-import com.bumblebee.bumblebeebackend.repo.StatusRepo;
-import com.bumblebee.bumblebeebackend.repo.UserLoginCredentialRepo;
-import com.bumblebee.bumblebeebackend.repo.UserPasswordRepo;
-import com.bumblebee.bumblebeebackend.repo.UserRepo;
+import com.bumblebee.bumblebeebackend.exception.EntryNotFoundException;
+import com.bumblebee.bumblebeebackend.repo.*;
 import com.bumblebee.bumblebeebackend.service.UserService;
 import com.bumblebee.bumblebeebackend.util.JwtUtil;
 import com.bumblebee.bumblebeebackend.util.LoginStatusId;
+import com.bumblebee.bumblebeebackend.util.PlanId;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,6 +48,8 @@ public class UserServiceImpl implements UserService {
     UserDetailsService userDetailsService;
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired
+    InstallmentPlanRepo installmentPlanRepo;
 
     @Override
     @Transactional
@@ -63,19 +64,27 @@ public class UserServiceImpl implements UserService {
             throw new EntryDuplicateException("email already exist");
         }
 
+        InstallmentPlan plan = installmentPlanRepo.getPlanByIdAndStatus(PlanId.INITIAL, 1);
+        if (Objects.equals(plan, null)){
+            throw new EntryNotFoundException("Plan Not Found");
+        }
+
         Date date = new Date();
 
         User user = new User(
                 0L,
                 date,
                 date,
-                dto.getFirstName(),
-                dto.getLastName(),
+                dto.getFirstName()+" "+dto.getFirstName(),
+                dto.getDateOfBirth(),
+                15000.00,
+                0.00,
                 dto.getEmail(),
                 dto.getNic(),
                 dto.getAddress(),
                 dto.getCountryCode(),
                 dto.getPhoneNumber(),
+                plan,
                 active
         );
         User saveUser = userRepo.save(user);
@@ -156,8 +165,11 @@ public class UserServiceImpl implements UserService {
             for (User user :all) {
                 Map<String, Object> obj = new HashMap<>();
                 obj.put("id",user.getId());
-                obj.put("firstName",user.getFirstName());
-                obj.put("lastName",user.getLastName());
+                obj.put("fullName",user.getFullName());
+                obj.put("dateOfBirth",user.getDateOfBirth());
+                obj.put("loanBalance",user.getLoanBalance());
+                obj.put("usedAmount",user.getUsedAmount());
+                obj.put("plan",user.getInstallmentPlanId().getPlanName());
                 obj.put("nic",user.getNicNo());
                 obj.put("phoneNumber",user.getPhoneNumber());
                 obj.put("address",user.getAddress());

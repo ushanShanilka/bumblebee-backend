@@ -37,6 +37,12 @@ public class Product  implements Serializable {
     private double price;
     @Column(name = "last_updated_by")
     private String lastUpdatedBy;
+    @JoinColumn(name = "brand_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Brand brandId;
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @OneToOne(optional = false)
+    private Category categoryId;
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Status statusId;

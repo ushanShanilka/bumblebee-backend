@@ -20,6 +20,9 @@ public class ProductDTO implements Serializable {
     private String description;
     private double rating;
     private double price;
-    private StockDTO qty;
+    private boolean status;
+    private CategoryDTO categoryDTO;
+    private BrandDTO brandsDTO;
+    private StockDTO stock;
     private List<ProductHasImageDTO> productHasImageDTOS;
 }

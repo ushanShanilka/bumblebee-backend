@@ -13,7 +13,7 @@ import java.util.Map;
 public interface ProductHasImagesService {
     String saveImages(List<ProductHasImageDTO> dto, Product product, String userName);
     String updateImages(List<ProductHasImageDTO> dto, Product product, String userName);
-    String deleteImage(Long id, String userName);
+    String deleteImage(Long id, String userName, String type);
     List<Map<String, Object>> getImagesByProductId(Long productId);
 
 }

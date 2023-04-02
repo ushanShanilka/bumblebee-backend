@@ -10,13 +10,13 @@ import java.util.Date;
 
 /**
  * @author Ushan Shanilka <ushanshanilka80@gmail.com>
- * @since 2/14/2023
+ * @since 4/2/2023
  **/
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity(name = "admin")
-public class Admin implements Serializable {
+@Entity(name = "category")
+public class Category implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,21 +27,10 @@ public class Admin implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "date_of_birth")
-    private String dateOfBirth;
-    @Column(name = "country_code")
-    private String countryCode;
-    @Column(name = "phone_number")
-    private String phoneNumber;
-    @JoinColumn(name = "admin_type_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private AdminType adminTypeId;
+    @Column(name = "category_name")
+    private String categoryName;
+    @Column(name = "last_updated_by")
+    private String lastUpdatedBy;
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Status statusId;

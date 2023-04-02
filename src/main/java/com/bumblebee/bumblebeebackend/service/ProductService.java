@@ -14,8 +14,8 @@ import java.util.Map;
 public interface ProductService {
     String productSave(ProductDTO dto, String userName, String type);
     String productUpdate(ProductDTO dto, String userName, String type);
-    Map<String, Object> getProduct(Long id, String userName);
+    Map<String, Object> getProduct(Long id, String userName, String type);
     String deleteProduct(Long id, String userName, String type);
-    PaginatedDTO getAllProduct(String value, String type, Pageable pageable);
+    List<Map<String, Object>> getAllProduct(String value, String type);
 
 }
