@@ -38,10 +38,6 @@ import java.util.Objects;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-    public AdminServiceImpl(){
-        System.out.println("new");
-    }
-
     @Autowired
     StatusRepo statusRepo;
     @Autowired

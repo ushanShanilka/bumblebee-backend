@@ -8,12 +8,15 @@ import com.bumblebee.bumblebeebackend.exception.CustomException;
 import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
 import com.bumblebee.bumblebeebackend.exception.EntryNotFoundException;
 import com.bumblebee.bumblebeebackend.repo.*;
+import com.bumblebee.bumblebeebackend.service.MailService;
+import com.bumblebee.bumblebeebackend.service.OtpService;
 import com.bumblebee.bumblebeebackend.service.UserService;
 import com.bumblebee.bumblebeebackend.util.JwtUtil;
 import com.bumblebee.bumblebeebackend.util.LoginStatusId;
 import com.bumblebee.bumblebeebackend.util.PlanId;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,11 +53,15 @@ public class UserServiceImpl implements UserService {
     JwtUtil jwtUtil;
     @Autowired
     InstallmentPlanRepo installmentPlanRepo;
+    @Autowired
+    OtpService otpService;
 
     @Override
     @Transactional
+    @Modifying
     public String userSingUp (RegisterDTO dto) {
         Status active = statusRepo.findById(StatusId.ACTIVE);
+        Status notVerified = statusRepo.findById(StatusId.NOTVERIFIED);
 
         if (userRepo.existsByNicNoAndStatusId(dto.getNic(), active)){
             throw new EntryDuplicateException("nic no already exist");
@@ -68,9 +75,7 @@ public class UserServiceImpl implements UserService {
         if (Objects.equals(plan, null)){
             throw new EntryNotFoundException("Plan Not Found");
         }
-
         Date date = new Date();
-
         User user = new User(
                 0L,
                 date,
@@ -85,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 dto.getCountryCode(),
                 dto.getPhoneNumber(),
                 plan,
-                active
+                notVerified
         );
         User saveUser = userRepo.save(user);
         if (!Objects.equals(saveUser.getId(), null)){
@@ -111,6 +116,7 @@ public class UserServiceImpl implements UserService {
                         active
                 );
                 userPasswordRepo.save(userPassword);
+                otpService.sendOtp(user.getEmail(), saveUser);
                 return "success";
             }
         }

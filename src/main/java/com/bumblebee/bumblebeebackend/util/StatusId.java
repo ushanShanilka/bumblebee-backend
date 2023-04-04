@@ -8,4 +8,5 @@ package com.bumblebee.bumblebeebackend.util;
 public class StatusId {
     public static final short ACTIVE = 1;
     public static final short DELETE = 2;
+    public static final short NOTVERIFIED = 3;
 }

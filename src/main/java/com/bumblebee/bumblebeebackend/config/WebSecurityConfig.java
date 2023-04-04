@@ -45,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/webjars/**",
                         "/api/v1/authenticates/admin/login",
                         "/api/v1/authenticates/user/login",
-                        "/api/v1/authenticates/user/signup")
+                        "/api/v1/authenticates/user/signup",
+                        "/api/v1/otp/**")
                 .permitAll()
                 .antMatchers().hasAuthority("USER")
                 .antMatchers().hasAnyAuthority("ADMIN", "SUPERADMIN", "USER")
