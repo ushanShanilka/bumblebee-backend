@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
  **/
 @Repository
 public interface UserRepo extends JpaRepository<User, Long> {
-    boolean existsByNicNoAndStatusId (String nicNo, Status statusId);
-    boolean existsByEmailAndStatusId (String email, Status statusId);
+    boolean existsByNicNo(String nicNo);
+    boolean existsByEmail(String email);
     boolean existsByIdAndStatusId (Long id, Status statusId);
     User findByEmailAndStatusId (String email, Status statusId);
     User findByIdAndStatusId (Long id, Status statusId);

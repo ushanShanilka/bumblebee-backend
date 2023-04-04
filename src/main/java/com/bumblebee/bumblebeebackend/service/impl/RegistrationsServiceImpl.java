@@ -25,7 +25,6 @@ public class RegistrationsServiceImpl implements RegistrationsService {
         if (type.equals("ADMIN")){
             return adminService.adminSingUp(dto,userName);
         }else if (type.equals("USER")){
-            System.out.println("user");
             return userService.userSingUp(dto);
         }
         return null;

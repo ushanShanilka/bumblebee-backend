@@ -87,6 +87,7 @@ public class AdminServiceImpl implements AdminService {
 
         response.setCode(200);
         response.setJwt(jwt);
+        response.setUserName(adminLogin.getUserName());
         response.setMessage("success");
 
         return response;

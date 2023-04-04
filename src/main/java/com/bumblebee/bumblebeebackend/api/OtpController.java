@@ -21,15 +21,13 @@ public class OtpController {
     OtpService otpService;
 
     @PostMapping
-    public ResponseEntity<?> checkOtp(@RequestBody OtpConfirmationDTO dto){
+    public ResponseEntity<StandardResponse> checkOtp(@RequestBody OtpConfirmationDTO dto){
         String s = otpService.otpConfirmation(dto);
         return new ResponseEntity<>(
-                s,
-                HttpStatus.OK
-        );
+                new StandardResponse(200,s,null),HttpStatus.OK);
     }
 
-    @PostMapping(path = "/resend", params = "email")
+    @GetMapping(path = "/resend", params = "email")
     public ResponseEntity<StandardResponse> resendOtp(@RequestParam String email){
         String s = otpService.resendOtp(email);
         return new ResponseEntity<>(

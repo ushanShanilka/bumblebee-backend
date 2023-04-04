@@ -52,12 +52,13 @@ public class OtpServiceImpl implements OtpService {
                 tempOtpRepo.delete(temp);
                 temp.getUserId().setStatusId(active);
                 userRepo.save(temp.getUserId());
+                mailService.mailSender("REGISTRATION SUCCESS!","Hello "+temp.getUserId().getFullName()+"<br\">, Thank you for opening an account on our website. We have already given you a loan amount of 15000.00 rupees. To know more about it and use our mobile app", temp.getEmail());
                 return "success";
             } else {
                 throw new EntryNotFoundException("invalid OTP");
             }
         }
-        throw new EntryNotFoundException("invalid OTP");
+        throw new EntryNotFoundException("otp not found OTP");
     }
 
     @Override

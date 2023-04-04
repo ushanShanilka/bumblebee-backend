@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Data
 public class LoginResponseDTO implements Serializable {
     private int code;
+    private String userName;
     private String message;
     private String jwt;
 }

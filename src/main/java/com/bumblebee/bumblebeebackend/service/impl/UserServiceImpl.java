@@ -63,11 +63,19 @@ public class UserServiceImpl implements UserService {
         Status active = statusRepo.findById(StatusId.ACTIVE);
         Status notVerified = statusRepo.findById(StatusId.NOTVERIFIED);
 
-        if (userRepo.existsByNicNoAndStatusId(dto.getNic(), active)){
+        if (!Objects.equals(dto.getEmail(), dto.getConfirmEmail())){
+            throw new CustomException("email and confirm email dos not match");
+        }
+
+        if (!Objects.equals(dto.getPassword(), dto.getConfirmPassword())){
+            throw new CustomException("password and confirm password email dos not match");
+        }
+
+        if (userRepo.existsByNicNo(dto.getNic())){
             throw new EntryDuplicateException("nic no already exist");
         }
 
-        if (userRepo.existsByEmailAndStatusId(dto.getEmail(), active)){
+        if (userRepo.existsByEmail(dto.getEmail())){
             throw new EntryDuplicateException("email already exist");
         }
 
@@ -157,6 +165,7 @@ public class UserServiceImpl implements UserService {
 
         response.setCode(200);
         response.setJwt(jwt);
+        response.setUserName(userLogin.getUserName());
         response.setMessage("success");
 
         return response;
