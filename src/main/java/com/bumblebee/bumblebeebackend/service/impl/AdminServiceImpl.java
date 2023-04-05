@@ -15,6 +15,7 @@ import com.bumblebee.bumblebeebackend.util.JwtUtil;
 import com.bumblebee.bumblebeebackend.util.LoginStatusId;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import javax.transaction.TransactionalException;
 import java.util.Date;
 import java.util.List;
@@ -63,15 +65,17 @@ public class AdminServiceImpl implements AdminService {
         Status status = statusRepo.findById(StatusId.ACTIVE);
         AdminLoginCredential adminLogin = adminLoginCredentialRepo.findByUserNameAndStatusId(dto.getUsername(), status);
 
+        System.out.println("1");
         if (Objects.equals(adminLogin, null)) {
             throw new EntryNotFoundException("User Not Found");
         }
-
+        System.out.println("2");
         boolean exists = adminRepo.existsById(adminLogin.getAdminId().getId());
         if (!exists){
             throw new EntryNotFoundException("User Not Found");
         }
 
+        System.out.println("3");
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
         if (Objects.equals(authenticate, null)){
             throw new BadCredentialsException("Bad Credentials");
@@ -94,6 +98,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public String adminSingUp (RegisterDTO dto, String userName) {
         Status active = statusRepo.findById(StatusId.ACTIVE);
         AdminLoginCredential adminLogin = adminLoginCredentialRepo.findByUserNameAndStatusId(userName, active);
@@ -170,6 +176,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public String deleteUser (Long adminId) {
         return null;
     }

@@ -8,7 +8,6 @@ import com.bumblebee.bumblebeebackend.exception.CustomException;
 import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
 import com.bumblebee.bumblebeebackend.exception.EntryNotFoundException;
 import com.bumblebee.bumblebeebackend.repo.*;
-import com.bumblebee.bumblebeebackend.service.MailService;
 import com.bumblebee.bumblebeebackend.service.OtpService;
 import com.bumblebee.bumblebeebackend.service.UserService;
 import com.bumblebee.bumblebeebackend.util.JwtUtil;
@@ -25,8 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 /**
@@ -132,6 +131,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public LoginResponseDTO userLogin (AuthenticationRequestDTO dto) {
         LoginResponseDTO response = new LoginResponseDTO();
 

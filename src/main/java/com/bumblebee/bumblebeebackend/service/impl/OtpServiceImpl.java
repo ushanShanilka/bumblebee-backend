@@ -11,7 +11,6 @@ import com.bumblebee.bumblebeebackend.repo.UserRepo;
 import com.bumblebee.bumblebeebackend.service.MailService;
 import com.bumblebee.bumblebeebackend.service.OtpService;
 import com.bumblebee.bumblebeebackend.service.StatusService;
-import com.bumblebee.bumblebeebackend.service.UserService;
 import com.bumblebee.bumblebeebackend.util.OtpGenerate;
 import com.bumblebee.bumblebeebackend.util.StatusId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +41,8 @@ public class OtpServiceImpl implements OtpService {
     MailService mailService;
 
     @Override
+    @Transactional
+    @Modifying
     public String otpConfirmation (OtpConfirmationDTO dto) {
         Status active = statusService.getStatus(StatusId.ACTIVE);
 

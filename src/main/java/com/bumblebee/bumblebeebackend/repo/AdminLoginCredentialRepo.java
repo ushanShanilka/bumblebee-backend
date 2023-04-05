@@ -3,6 +3,7 @@ package com.bumblebee.bumblebeebackend.repo;
 import com.bumblebee.bumblebeebackend.entity.AdminLoginCredential;
 import com.bumblebee.bumblebeebackend.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,7 @@ public interface AdminLoginCredentialRepo extends JpaRepository<AdminLoginCreden
 	List<AdminLoginCredential> findAll();
 	void deleteById(Long id);
 	AdminLoginCredential findByUserNameAndStatusId(String userName, Status status);
+
+//	@Query(value = "select * from admin_login_credential where user_name=?1 and status_id=1", nativeQuery = true)
+//	AdminLoginCredential findByUserNameAndStatusId(String userName, Status status);
 }

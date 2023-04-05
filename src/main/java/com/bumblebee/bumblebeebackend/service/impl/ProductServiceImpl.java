@@ -64,6 +64,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public String productUpdate (ProductDTO dto, String userName, String type) {
         if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
             Product product = productRepo.existsByID(dto.getId());
@@ -79,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public Map<String, Object> getProduct (Long id, String userName, String type) {
         Product product = null;
         if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
@@ -135,6 +139,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public List<Map<String, Object>> getAllProduct (String value, String type) {
         List<Product> all = null;
         List<Map<String, Object>> map = new ArrayList<>();
