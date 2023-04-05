@@ -1,9 +1,6 @@
 package com.bumblebee.bumblebeebackend.service.impl;
 
-import com.bumblebee.bumblebeebackend.dto.RegisterDTO;
-import com.bumblebee.bumblebeebackend.dto.AuthenticationRequestDTO;
-import com.bumblebee.bumblebeebackend.dto.LoginResponseDTO;
-import com.bumblebee.bumblebeebackend.dto.PasswordChangeDTO;
+import com.bumblebee.bumblebeebackend.dto.*;
 import com.bumblebee.bumblebeebackend.entity.*;
 import com.bumblebee.bumblebeebackend.exception.CustomException;
 import com.bumblebee.bumblebeebackend.exception.EntryDuplicateException;
@@ -27,10 +24,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.transaction.TransactionalException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Ushan Shanilka <ushanshanilka80@gmail.com>
@@ -65,17 +60,14 @@ public class AdminServiceImpl implements AdminService {
         Status status = statusRepo.findById(StatusId.ACTIVE);
         AdminLoginCredential adminLogin = adminLoginCredentialRepo.findByUserNameAndStatusId(dto.getUsername(), status);
 
-        System.out.println("1");
         if (Objects.equals(adminLogin, null)) {
             throw new EntryNotFoundException("User Not Found");
         }
-        System.out.println("2");
-        boolean exists = adminRepo.existsById(adminLogin.getAdminId().getId());
+        boolean exists = adminRepo.existsByIdAndStatusId(adminLogin.getAdminId().getId(), status);
         if (!exists){
             throw new EntryNotFoundException("User Not Found");
         }
 
-        System.out.println("3");
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
         if (Objects.equals(authenticate, null)){
             throw new BadCredentialsException("Bad Credentials");
@@ -122,6 +114,16 @@ public class AdminServiceImpl implements AdminService {
                 AdminType type = adminTypeRepo.findById(AdminTypeId.ADMIN);
                 Date date = new Date();
 
+                Status status = null;
+
+                System.out.println(dto.getStatus());
+
+                if (dto.getStatus() == 1){
+                    status = statusRepo.findById(StatusId.ACTIVE);
+                }else {
+                    status = statusRepo.findById(StatusId.NOTVERIFIED);
+                }
+
                 Admin a = new Admin();
                 a.setFirstName(dto.getFirstName());
                 a.setLastName(dto.getLastName());
@@ -130,7 +132,7 @@ public class AdminServiceImpl implements AdminService {
                 a.setCountryCode(dto.getCountryCode());
                 a.setPhoneNumber(dto.getPhoneNumber());
                 a.setAdminTypeId(type);
-                a.setStatusId(active);
+                a.setStatusId(status);
                 a.setCreatedAt(date);
                 a.setUpdatedAt(date);
 
@@ -166,13 +168,124 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
+    @Modifying
+    public String updateAdmin (AdminDTO dto, String type) {
+        if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
+
+            Admin a = adminRepo.getAdmin(dto.getId());
+            if (!Objects.equals(dto.getEmail(), dto.getConfirmEmail())){
+                throw new CustomException("Email and confirm email not equal");
+            }
+
+            if (!Objects.equals(a, null)){
+
+                Date date = new Date();
+
+                Status status = null;
+
+                if (dto.getStatus() == 1){
+                    status = statusRepo.findById(StatusId.ACTIVE);
+                }else {
+                    status = statusRepo.findById(StatusId.NOTVERIFIED);
+                }
+
+                a.setDateOfBirth(dto.getBirthDay());
+                a.setCountryCode(dto.getCountryCode());
+                a.setEmail(dto.getEmail());
+                a.setFirstName(dto.getFirstName());
+                a.setLastName(dto.getLastName());
+                a.setUpdatedAt(date);
+                a.setStatusId(status);
+                a.setPhoneNumber(dto.getPhoneNumber());
+
+                adminRepo.save(a);
+
+                AdminLoginCredential loginCredential = adminLoginCredentialRepo.findByAdminId(a);
+                loginCredential.setUserName(dto.getEmail());
+                loginCredential.setUpdatedAt(date);
+                adminLoginCredentialRepo.save(loginCredential);
+
+                Status active = statusRepo.findById(StatusId.ACTIVE);
+
+                System.out.println(dto.getPassword());
+
+                if (!dto.getPassword().equals("")){
+
+                    if (!Objects.equals(dto.getPassword(), dto.getConfirmPassword())){
+                        throw new CustomException("Password not equal");
+                    }
+
+                    AdminPassword password = adminPasswordRepo.findByAdminLoginCredentialIdAndStatusId(loginCredential, active);
+                    password.setPassword(BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt(10)));
+                    password.setUpdatedAt(date);
+                    adminPasswordRepo.save(password);
+                }
+
+                return "success";
+            }
+            throw new EntryNotFoundException("user not exist");
+        }
+        throw new BadCredentialsException("invalid user");
+    }
+
+    @Override
     public LoginResponseDTO adminPasswordChange (PasswordChangeDTO dto) {
         return null;
     }
 
     @Override
-    public List<Map<String, Object>> getAllAdmin (String value) {
-        return null;
+    public List<Map<String, Object>> getAllAdmin (String type) {
+        if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
+            List<Admin> all = adminRepo.findAll();
+            List<Map<String, Object>> map = new ArrayList<>();
+
+            for (Admin a:all) {
+                Map<String, Object> obj = new HashMap<>();
+                obj.put("id",a.getId());
+                obj.put("countryCode",a.getCountryCode());
+                obj.put("createdAt",new SimpleDateFormat("dd-MMM-yyyy").format(a.getUpdatedAt()));
+                obj.put("updatedAt",new SimpleDateFormat("dd-MMM-yyyy").format(a.getUpdatedAt()));
+                obj.put("birthDay",a.getDateOfBirth());
+                obj.put("email",a.getEmail());
+                obj.put("confirmEmail",a.getEmail());
+                obj.put("firstName",a.getFirstName());
+                obj.put("lastName",a.getLastName());
+                obj.put("phoneNumber",a.getPhoneNumber());
+                obj.put("adminType",a.getAdminTypeId().getType());
+                obj.put("status",a.getStatusId().getId());
+
+                map.add(obj);
+            }
+            return map;
+        }
+        throw new BadCredentialsException("invalid user");
+    }
+
+    @Override
+    public Map<String, Object> getAdmin (Long adminId,String type) {
+        if (Objects.equals(type, "ADMIN") || Objects.equals(type, "SUPERADMIN")){
+            Admin a = adminRepo.getAdmin(adminId);
+            if (!Objects.equals(a, null)){
+                Map<String, Object> obj = new HashMap<>();
+                obj.put("id",a.getId());
+                obj.put("countryCode",a.getCountryCode());
+                obj.put("createdAt",new SimpleDateFormat("dd-MMM-yyyy").format(a.getUpdatedAt()));
+                obj.put("updatedAt",new SimpleDateFormat("dd-MMM-yyyy").format(a.getUpdatedAt()));
+                obj.put("birthDay",a.getDateOfBirth());
+                obj.put("email",a.getEmail());
+                obj.put("confirmEmail",a.getEmail());
+                obj.put("firstName",a.getFirstName());
+                obj.put("lastName",a.getLastName());
+                obj.put("phoneNumber",a.getPhoneNumber());
+                obj.put("adminType",a.getAdminTypeId().getType());
+                obj.put("status",a.getStatusId().getId());
+
+                return obj;
+            }
+            throw new EntryNotFoundException("user not exist");
+        }
+        throw new BadCredentialsException("invalid user");
     }
 
     @Override

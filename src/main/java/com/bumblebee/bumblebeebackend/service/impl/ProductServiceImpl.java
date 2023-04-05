@@ -188,8 +188,6 @@ public class ProductServiceImpl implements ProductService {
             status = statusService.getStatus(StatusId.DELETE);
         }
 
-        System.out.println(dto);
-
         Category category = categoryRepo.findCategoryById(dto.getCategoryDTO().getCategoryId());
         if (Objects.equals(category, null)){
             throw new EntryNotFoundException("Category not exist");

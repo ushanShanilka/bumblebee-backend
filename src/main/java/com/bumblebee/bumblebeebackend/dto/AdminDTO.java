@@ -8,23 +8,21 @@ import java.io.Serializable;
 
 /**
  * @author Ushan Shanilka <ushanshanilka80@gmail.com>
- * @since 2/14/2023
+ * @since 4/5/2023
  **/
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class RegisterDTO implements Serializable {
+public class AdminDTO implements Serializable {
+    private Long id;
+    private String countryCode;
+    private String birthDay;
+    private String email;
+    private String confirmEmail;
     private String firstName;
     private String lastName;
-    private String email;
-    private String dateOfBirth;
-    private String confirmEmail;
-    private String nic;
-    private String address;
+    private String phoneNumber;
     private String password;
     private String confirmPassword;
-    private String countryCode;
-    private String phoneNumber;
     private int status;
 }

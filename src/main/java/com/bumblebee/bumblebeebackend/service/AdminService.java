@@ -1,9 +1,6 @@
 package com.bumblebee.bumblebeebackend.service;
 
-import com.bumblebee.bumblebeebackend.dto.RegisterDTO;
-import com.bumblebee.bumblebeebackend.dto.AuthenticationRequestDTO;
-import com.bumblebee.bumblebeebackend.dto.LoginResponseDTO;
-import com.bumblebee.bumblebeebackend.dto.PasswordChangeDTO;
+import com.bumblebee.bumblebeebackend.dto.*;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +13,9 @@ import java.util.Map;
 public interface AdminService {
     LoginResponseDTO adminLogin(AuthenticationRequestDTO dto);
     String adminSingUp(RegisterDTO dto, String userName);
+    String updateAdmin(AdminDTO dto,String type);
     LoginResponseDTO adminPasswordChange(PasswordChangeDTO dto);
-    List<Map<String, Object>> getAllAdmin(String value);
+    List<Map<String, Object>> getAllAdmin(String type);
+    Map<String, Object> getAdmin(Long adminId,String type);
     String deleteUser(Long adminId);
 }
